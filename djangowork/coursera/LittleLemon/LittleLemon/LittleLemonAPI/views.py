@@ -20,7 +20,7 @@ from rest_framework import status, viewsets
 @api_view(['GET'])
 def menu_items(request):
     #item and serialized item are variables
-    items = MenuItem.objects.all() #retrieves all items from the 'menuitem' data base and stores them in 'items' variable
+    items = MenuItem.objects.select_related('category').all() #retrieves all items from the 'menuitem' data base and stores them in 'items' variable
     serialized_item = MenuItemSerializer(items, many=True)# creates an instance of the menuitemserializer, initializes it with the items queryset, many=true because items represents a collection of multiple items
     return Response(serialized_item.data)#returns the serialized data,
     # when you return Response(serialized_item.data),

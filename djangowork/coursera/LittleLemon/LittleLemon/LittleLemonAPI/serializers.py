@@ -1,14 +1,20 @@
 from rest_framework import serializers #required to use serializers functions
 # from .models import MenuItem #imports the model
-from .models import EmployeeList, MenuItem
+from .models import EmployeeList, MenuItem, Category
 from decimal import Decimal
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'slug', 'title']
 
 class MenuItemSerializer(serializers.ModelSerializer): #by inheriting from serializer class i get a lot of serialization logic for free, automaticaly generates serializers from underlying model
     stock = serializers.IntegerField(source='inventory') #creates now field and links it to an existing field with the scource argument
     price_after_tax = serializers.SerializerMethodField(method_name= 'calculate_tax')
+    category = CategorySerializer
     class Meta: #meta class is used to specify meta data about serialization proccess
         model = MenuItem #specifys which model to base serializer on
-        fields = ["id","title", 'price', 'stock', 'price_after_tax'] #specifies which fields to include
+        fields = ["id","title", 'price', 'stock', 'price_after_tax', 'category'] #specifies which fields to include
     
     def calculate_tax(self, product:MenuItem):
         return product.price * Decimal(1.1)
