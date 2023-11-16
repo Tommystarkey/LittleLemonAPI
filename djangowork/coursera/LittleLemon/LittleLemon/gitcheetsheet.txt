@@ -1,0 +1,6 @@
+git status
+git pull orgin main
+git add .
+git commit -m "commit message here"
+git push origin LittleLemonAPI
+
