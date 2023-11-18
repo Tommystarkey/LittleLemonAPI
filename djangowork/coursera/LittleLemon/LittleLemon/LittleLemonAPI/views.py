@@ -26,25 +26,34 @@ def category_detail(request, pk):
 @api_view(['GET'])
 def menu_items(request):
     #item and serialized item are variables
-    items = MenuItem.objects.select_related('category').all() #
-    #serialized_item = MenuItemSerializer(items, many=True)# creates an instance of the menuitemserializer, initializes it with the items queryset, many=true because items represents a collection of multiple items
-    #The argument context={'request': request} lets the menu-items endpoint display the category field as a hyperlink.
+    items = MenuItem.objects.select_related('category').all()
+    #specifies model
+    ##object is a a manager responsible for database queries
+    #select_related allows access to related models
     serialized_item = MenuItemSerializer(items, many=True, context={'request': request})
+    #specifies the correct serializer
+    #many=True,indicates that you are serializing multiple objects (a queryset)
+    #context part passes the URLpattern to the serializer required for the hyperlink to work
     return Response(serialized_item.data)#returns the serialized data,
-    # when you return Response(serialized_item.data),
-    # you are essentially sending the serialized data in the HTTP response.
-    # This data will be converted to JSON (or the appropriate format based on content negotiation)
-    # and sent back to the client making the API request.
+    #'serialized_item.data' represents serialized form of menuitem in a suitible format ie 'JSON'
 
-@api_view(['GET'])#decorator is used to define function based view that can handle HTTP methods
-def single_item(request, id):#defines single_item view that takes a request object with an id parameter
-    item = get_object_or_404(MenuItem,pk=id)#used to retrieve a single instance of 'menuitem
-    serialized_item = MenuItemSerializer(item)#specifies what serializer to use with item is a parameter
-    return Response(serialized_item.data)#'serialized_item.data' represents serialized form of menuitem in a suitible format ie 'JSON'
+@api_view(['GET'])
+#decorator is used to define function based view that can handle HTTP methods
+def single_item(request, id):
+    #defines single_item view that takes a request object with an id parameter
+    item = get_object_or_404(MenuItem,pk=id)
+    #used to retrieve a single instance of menuitem
+    serialized_item = MenuItemSerializer(item)
+    #specifies what serializer to use with item is a parameter
+    return Response(serialized_item.data)
+    #'serialized_item.data' represents serialized form of menuitem in a suitible format ie 'JSON'
 
 #class based view does not require 'api_view' decorator
-class EmployeeListViewSet(viewsets.ModelViewSet): #inherits from viewsets.modelviewset
-    queryset = EmployeeList.objects.all() #'queryset specifys which instances of the model are availible for this view
-    serializer_class = EmployeeListSerializer#specifies which serializer to use
+class EmployeeListViewSet(viewsets.ModelViewSet):
+    #inherits from viewsets.modelviewset
+    queryset = EmployeeList.objects.all()
+    #'queryset specifys which instances of the model are availible for this view
+    serializer_class = EmployeeListSerializer
+    #specifies which serializer to use
 
 

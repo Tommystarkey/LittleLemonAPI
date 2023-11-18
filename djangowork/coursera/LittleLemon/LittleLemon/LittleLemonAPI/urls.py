@@ -8,9 +8,19 @@ router.register(r'employee-list', views.EmployeeListViewSet)
 urlpatterns = [
     # path('menu-items/', views.MenuItemsView.as_view()),
     path('menu-items/', views.menu_items),
+    #path function defines URL pattern for menuItems view
     path('menu-items/<int:id>/', views.single_item),
+    #path function defines URL pattern for menuItems view,
+    #with path converter that captures integer and stores it as id variable
     path('employee-list/', views.EmployeeListViewSet.as_view({'get': 'list', 'post': 'create'})),
+    #path function defines URL pattern for employeeList view,
+    #as_view method call converts class based view to a function
+    #indicates that GET and POST methods are allowed
     path('employee-list/<int:pk>/', views.EmployeeListViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'})),
+    #path function defines URL pattern for employeeList view,
+    #with path converter that captures integer and stores it as pk variable
+    #as_view method call converts class based view to a function
+    #indicates that GET, PUT, PATCH and DELETE methods are allowed
     path('category/<int:pk>/', views.category_detail, name='category-detail')
  
     # path('menu-items/<int:pk>', views.SingleMenuItemView.as_view()),
