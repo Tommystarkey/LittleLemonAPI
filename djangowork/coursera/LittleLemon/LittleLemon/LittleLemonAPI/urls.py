@@ -11,6 +11,7 @@ urlpatterns = [
     path('menu-items/<int:id>/', views.single_item),
     path('employee-list/', views.EmployeeListViewSet.as_view({'get': 'list', 'post': 'create'})),
     path('employee-list/<int:pk>/', views.EmployeeListViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'})),
+    path('category/<int:pk>/', views.category_detail, name='category-detail')
  
     # path('menu-items/<int:pk>', views.SingleMenuItemView.as_view()),
     #django framework expects a function based view, "as_view()" method is used to convert class based views to function based views

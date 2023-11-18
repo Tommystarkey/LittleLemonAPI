@@ -7,7 +7,7 @@ class Category(models.Model):
     title = models.CharField(max_length=255)
 
     def __str__(self)-> str:
-        return self.title
+        return self.title #string converter or something
 
 class MenuItem(models.Model): #defines a class that inherits from the "models.Model" class
     title = models.CharField(max_length=255)

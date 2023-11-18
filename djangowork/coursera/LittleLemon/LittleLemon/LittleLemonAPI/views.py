@@ -12,16 +12,24 @@
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from . models import MenuItem, EmployeeList
-from . serializers import MenuItemSerializer, EmployeeListSerializer
+from . models import MenuItem, EmployeeList, Category
+from . serializers import MenuItemSerializer, EmployeeListSerializer, CategorySerializer
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
+
+@api_view()
+def category_detail(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    serialized_category = CategorySerializer(category)
+    return Response(serialized_category.data)
 
 @api_view(['GET'])
 def menu_items(request):
     #item and serialized item are variables
     items = MenuItem.objects.select_related('category').all() #
-    serialized_item = MenuItemSerializer(items, many=True)# creates an instance of the menuitemserializer, initializes it with the items queryset, many=true because items represents a collection of multiple items
+    #serialized_item = MenuItemSerializer(items, many=True)# creates an instance of the menuitemserializer, initializes it with the items queryset, many=true because items represents a collection of multiple items
+    #The argument context={'request': request} lets the menu-items endpoint display the category field as a hyperlink.
+    serialized_item = MenuItemSerializer(items, many=True, context={'request': request})
     return Response(serialized_item.data)#returns the serialized data,
     # when you return Response(serialized_item.data),
     # you are essentially sending the serialized data in the HTTP response.
