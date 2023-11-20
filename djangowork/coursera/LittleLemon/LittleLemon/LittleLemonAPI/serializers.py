@@ -14,24 +14,19 @@ class MenuItemSerializer(serializers.ModelSerializer):
     stock = serializers.IntegerField(source='inventory')
     #creates new field and links it to an existing field with the scource argument
     price_after_tax = serializers.SerializerMethodField(method_name= 'calculate_tax')
-    category = serializers.HyperlinkedRelatedField(view_name='category-detail', queryset=Category.objects.all())
-    #takes two params, two specify what fields can be referenced and what url pattern to use
+    category = CategorySerializer(read_only=True)
+    category_id = serializers.IntegerField(write_only=True)
     class Meta:
     #meta class is used to specify meta data about serialization proccess
         model = MenuItem
         #specifys which model to base serializer on
-        fields = ["id","title", 'price', 'stock', 'price_after_tax', 'category']
+        fields = ["id", "title", 'price', 'stock', 'price_after_tax', 'category', 'category_id']
         #specifies which fields to include
 
     
     def calculate_tax(self, product:MenuItem):
         return product.price * Decimal(1.1)
 
-# class MenuItemSerializer(serializers.Serializer):
-#     id = serializers.IntegerField()
-#     title = serializers.CharField(max_length=255)
-#     price = serializers.DecimalField(max_digits=6, decimal_places=2)
-#     inventory = serializers.IntegerField()
 
 class EmployeeListSerializer(serializers.ModelSerializer):
 #'Modelserializer is a class that automatically generates serializers so you have to write less code
