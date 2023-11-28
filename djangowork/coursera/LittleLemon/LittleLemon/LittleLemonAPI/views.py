@@ -1,15 +1,19 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, renderer_classes
 from . models import MenuItem, EmployeeList, Category
 from . serializers import MenuItemSerializer, CategorySerializer
 from rest_framework import status
+from rest_framework.renderers import TemplateHTMLRenderer, StaticHTMLRenderer
+from rest_framework_csv.renderers import CSVRenderer
+
 
 from rest_framework import viewsets
 from . serializers import EmployeeListSerializer
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
+# @renderer_classes([CSVRenderer])
 def menu_items(request):
     #item and serialized item are variables
     if request.method == 'GET':
@@ -29,8 +33,7 @@ def menu_items(request):
         #many=True,indicates that you are serializing multiple objects (a queryset)        
         return Response(serialized_item.data)
         #returns the serialized data###
-        #.data is where the serialized data is stored
-       
+        #.data is where the serialized data is stored     
     if request.method == 'POST':
     #when client makes URL request, django proccesses request and creates HttpRequest object
     #which is passed as a parameter to the view function
@@ -58,6 +61,35 @@ def single_item(request, id):
     #specifies what serializer to use with item is a parameter
     return Response(serialized_item.data)
     #'serialized_item.data' represents serialized form of menuitem in a suitible format ie 'JSON'
+
+
+@api_view()
+#decorator from DRF that converts a regular function-based view into an API view
+@renderer_classes ([TemplateHTMLRenderer])
+#decorator that specifies the renderer classes to be used for rendering the response.
+#TemplateHTMLRenderer indicatesthe response should be rendered as HTML
+def menu(request):
+#main function for the view which takes a django request object as a parameter
+    items = MenuItem.objects.select_related('category').all()
+    #queries the data base for all MenuItem objects and stores them in "items" variable
+    serialized_item = MenuItemSerializer(items, many=True)
+    #serializes the retrieved MenuItem objects
+    #many=Trueindicates the serializer should handle multiple objects
+    return Response({'data':serialized_item.data}, template_name='menu-item.html')
+    #{'data': serialized_item.data} is a dictionary where the key is 'data',
+    #and the value is the serialized representation of the data obtained from the serialized_item.data attribute. 
+    #template_name='menu-item.html specifies the HTML template to use to display the data
+
+@api_view(['GET'])
+#decorator that specifies the accepted HTTP mehods for the view
+@renderer_classes([StaticHTMLRenderer])
+#decorator indicating the renderer classes to be used for the response
+def welcome(request):
+#main function for the view that takes adjango request as a parameter
+    data = '<html><body><h1>Welcome To Little Lemon API Project</h1></boy></html>'
+    #creates a simple HTML string and stores it in data variable
+    return Response(data)
+    #returns HTTP response with the data HTML string
 
 
 
