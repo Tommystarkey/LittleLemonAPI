@@ -26,7 +26,35 @@ def menu_items(request):
         ##object is a a manager responsible for database queries
         #select_related is used to perform SQL join to retrieve related category objects
         #.all() fetches all MenuItems from the database 
-        #stores queried objects in items variable      
+        #stores queried objects in items variable
+        
+        category_name = request.query_params.get('category')
+        #This line retrieves the value of the 'category' parameter from the request's query parameters.
+        #uses the query_params attribute of the request object to access the query parameters from a GET request
+        #The get method is then used to retrieve the value of a specific parameter
+        to_price = request.query_params.get('to_price')
+        #retrieves the value of the 'to_price' parameter from the request's query parameters
+        #The get method is used, and the value is assigned to the to_price variable
+        search = request.query_params.get('search')
+        #retrieves the value of the 'search' parameter from the request's query parameters
+        #The get method is used, and the value is assigned to the search variable as an argument.
+        if category_name:
+            #checks that the 'category' parameter was present in the request.
+            items = items.filter(category__title=category_name)
+            #.filter is a method from django ORM
+            # double underscore is used to traverse relationships
+        if to_price:
+            #checks that the 'to_price' parameter was present in the request.
+            items = items.filter(price__lte=to_price)
+            #.filter is a method from django ORM
+            #lte = less then or equal to
+        if search:
+            #checks that the 'search' parameter was present in the request.
+            items = items.filter(title__istartswith=search)
+            #.filter is a method from django ORM
+            #can use " (title__icontains=search) " to seach if the string is anywhere in the title
+            #remove the " i " to make the search case sensative            
+        
         serialized_item = MenuItemSerializer(items, many=True)
         ###this line serializes the queried MenuItem objects###
         #creates an instance of MenuItemSerializer and initializes it with the quieried menu_items objects (items)
@@ -34,6 +62,8 @@ def menu_items(request):
         return Response(serialized_item.data)
         #returns the serialized data###
         #.data is where the serialized data is stored     
+    
+    
     if request.method == 'POST':
     #when client makes URL request, django proccesses request and creates HttpRequest object
     #which is passed as a parameter to the view function
@@ -47,7 +77,7 @@ def menu_items(request):
         #saves the serialized data to the database
         #he save method is responsible for creating a new instance of the model or updating an existing one with the serialized data.
         return Response(serialized_item.data, status.HTTP_201_CREATED)
-        #returns response woth the serialized data and a HTTP status code
+        #returns response with the serialized data and a HTTP status code
 
 
 

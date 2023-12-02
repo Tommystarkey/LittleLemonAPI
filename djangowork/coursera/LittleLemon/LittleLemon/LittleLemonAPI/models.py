@@ -2,6 +2,21 @@ from django.db import models #imports models module from django database
 
 # Create your models here.
 
+# python manage.py shell
+# from LittleLemonAPI.models import Category, MenuItem, EmployeeList
+# all_menu_items = MenuItem.objects.all()
+# for menu_item in all_menu_items:
+    # print(
+    #     menu_item.title,
+    #     menu_item.price,
+    #     menu_item.inventory,
+    #     menu_item.category
+    # )
+
+###must be entered one line at a time with proper indentation ###
+
+
+
 class Category(models.Model):
 # creates new class that inherits from models.models
     slug = models.SlugField()
