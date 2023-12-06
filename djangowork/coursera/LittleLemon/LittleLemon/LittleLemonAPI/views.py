@@ -26,35 +26,59 @@ def menu_items(request):
         ##object is a a manager responsible for database queries
         #select_related is used to perform SQL join to retrieve related category objects
         #.all() fetches all MenuItems from the database 
-        #stores queried objects in items variable
-        
+        #stores queried objects in items variable        
         category_name = request.query_params.get('category')
-        #This line retrieves the value of the 'category' parameter from the request's query parameters.
-        #uses the query_params attribute of the request object to access the query parameters from a GET request
-        #The get method is then used to retrieve the value of a specific parameter
+        #'request' is an object of class HttpRequest
+        #'query_params' is an attribute of 'request' object that holds the query parameters
+        #'.get('category')' This is a method call on the dictionary-like object request.query_params.
+        #'category_name' is assigned the value of the 'category' parameter from the query parameters of the HTTP request.
         to_price = request.query_params.get('to_price')
-        #retrieves the value of the 'to_price' parameter from the request's query parameters
-        #The get method is used, and the value is assigned to the to_price variable
+        #'request' is an object of class HttpRequest
+        #'query_params' is an attribute of 'request' object that holds the query parameters
+        #'.get('to_price')' This is a method call on the dictionary-like object request.query_params.
+        #'to_price' is assigned the value of the 'to_price' parameter from the query parameters of the HTTP request.
         search = request.query_params.get('search')
-        #retrieves the value of the 'search' parameter from the request's query parameters
-        #The get method is used, and the value is assigned to the search variable as an argument.
+        #'request' is an object of class HttpRequest
+        #'query_params' is an attribute of 'request' object that holds the query parameters
+        #'.get('search')' This is a method call on the dictionary-like object request.query_params.
+        #'to_price' is assigned the value of the 'search' parameter from the query parameters of the HTTP request.
+        ordering = request.query_params.get('ordering')
+        #'request' is an object of class HttpRequest
+        #'query_params' is an attribute of 'request' object that holds the query parameters
+        #'.get('ordering')' This is a method call on the dictionary-like object request.query_params.
+        #'ordering' is assigned the value of the 'ordering' parameter from the query parameters of the HTTP request.
+
+        ###filterers###   
         if category_name:
             #checks that the 'category' parameter was present in the request.
             items = items.filter(category__title=category_name)
+            #ilters the 'items' queryset to include only items whose related category's title matches the 'category_name'   "/?category=SomeCategory"       
             #.filter is a method from django ORM
             # double underscore is used to traverse relationships
         if to_price:
-            #checks that the 'to_price' parameter was present in the request.
+        #checks that the 'to_price' parameter was present in the request.
             items = items.filter(price__lte=to_price)
+            #filters the 'items' queryset to include only items with a price less than or equal to the specified 'to_price  "/?to_price=50"
             #.filter is a method from django ORM
-            #lte = less then or equal to
+            #lte = less then or equal to  
         if search:
             #checks that the 'search' parameter was present in the request.
             items = items.filter(title__istartswith=search)
+            #filters the 'items' queryset to include only items whose title starts with the specified 'search' string   "/?search=SomeTitle"
             #.filter is a method from django ORM
             #can use " (title__icontains=search) " to seach if the string is anywhere in the title
-            #remove the " i " to make the search case sensative            
-        
+            #remove the " i " to make the search case sensative
+
+        ###orderer###
+        if ordering:
+        #checks that the 'ordering' parameter was present in the request.
+            items = items.order_by(ordering)  
+            #orders by price    "/?ordering=price"
+            #items: This is the queryset of MenuItem objects that has been filtered based on various conditions earlier in the code.
+            #.order_by(ordering): This is a method provided by Django's ORM that is used to specify the ordering of the queryset
+
+
+
         serialized_item = MenuItemSerializer(items, many=True)
         ###this line serializes the queried MenuItem objects###
         #creates an instance of MenuItemSerializer and initializes it with the quieried menu_items objects (items)
