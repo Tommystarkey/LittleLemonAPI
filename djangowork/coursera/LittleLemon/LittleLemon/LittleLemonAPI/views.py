@@ -1,15 +1,30 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, renderer_classes
-from . models import MenuItem, EmployeeList, Category
-from . serializers import MenuItemSerializer, CategorySerializer
+from . models import MenuItem, EmployeeList
+from . serializers import MenuItemSerializer
 from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer, StaticHTMLRenderer
-from rest_framework_csv.renderers import CSVRenderer
+from django.core.paginator import Paginator, EmptyPage
 
 
 from rest_framework import viewsets
 from . serializers import EmployeeListSerializer
+
+class MenuItemsViewSet(viewsets.ModelViewSet):
+#defines class as a subclass of 'viewsets.ModelViewSet', a base class that provides CRUD operations 
+    queryset = MenuItem.objects.all().order_by('id')
+    #queryset: This attribute defines the initial queryset of 'MenuItem' objects that will be used by the view.
+    #In this case, it fetches all 'MenuItem' objects and orders them by their id.
+    serializer_class = MenuItemSerializer
+    #specifies the serializer class that should be used to convert MenuItem instances to and from JSON.
+    ordering_fields=['price', 'inventory']
+    #specifies the fields on which the queryset can be ordered.
+    search_fields=['title', 'category__title']
+    #defines the fields on which the view can perform a search.
+    #The default lookup_field value for searching in DRF is icontains, which is case insensitive
+
+    #pagination for viewsets is dealt with in settings.py file
 
 
 @api_view(['GET', 'POST'])
@@ -47,6 +62,10 @@ def menu_items(request):
         #'query_params' is an attribute of 'request' object that holds the query parameters
         #'.get('ordering')' This is a method call on the dictionary-like object request.query_params.
         #'ordering' is assigned the value of the 'ordering' parameter from the query parameters of the HTTP request.
+        perpage = request.query_params.get('perpage', default=2)
+        #These lines retrieve the values of the perpage and page query parameters from the request.
+        page = request.query_params.get('page', default=1)
+        #If the parameter is not present in the request, it defaults to the specified values (2 for perpage and 1 for page).
 
         ###filterers###   
         if category_name:
@@ -77,8 +96,18 @@ def menu_items(request):
             #items: This is the queryset of MenuItem objects that has been filtered based on various conditions earlier in the code.
             #.order_by(ordering): This is a method provided by Django's ORM that is used to specify the ordering of the queryset
 
-
-
+        paginator = Paginator(items,per_page=perpage)
+        #initializes paginator object that takes "items" and per_page as args
+        try:
+            items = paginator.page(number=page)
+            #The try block is used to catch any exceptions that might be raised during the attempt.
+            #If the requested page is within the valid range (i.e., it exists), the items variable is updated to contain the items on the specified page
+        except EmptyPage:
+        #If the requested page is beyond the available pages (i.e., it's an empty page), it raises an EmptyPage exception.
+            items = []
+            #When the items array is empty due to the EmptyPage exception being caught
+            #the subsequent code that initializes the Paginator object will use the default values for perpage and page
+        
         serialized_item = MenuItemSerializer(items, many=True)
         ###this line serializes the queried MenuItem objects###
         #creates an instance of MenuItemSerializer and initializes it with the quieried menu_items objects (items)

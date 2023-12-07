@@ -10,11 +10,22 @@ router.register(r'employee-list', views.EmployeeListViewSet)
 #//////////////////////////////////////////////////////#
 
 urlpatterns = [
+   
+    path('menu-items/',views.MenuItemsViewSet.as_view({'get':'list'})),
+    #path function defines URL pattern for MenuItemsViewSet view,
+    #as_view method call converts class based view to a function
+    #indicates that GET method are allowed and are to be handled by the list view of the ModelViewSet base class
+    path('menu-items/<int:pk>/', views.MenuItemsViewSet.as_view({'get':'retrieve'})),
+    #path function defines URL pattern for MenuItemsViewSet view,
+    #with path converter that captures integer and stores it as pk variable
+    #as_view method call converts class based view to a function
+    #indicates that GET method are allowed and are to be handled by the list view of the ModelViewSet base class
+
     # path('menu-items/', views.MenuItemsView.as_view()),
-    path('menu-items/', views.menu_items),
+    #path('menu-items/', views.menu_items),
     #path function defines URL pattern for menuItems view
     
-    path('menu-items/<int:id>/', views.single_item),
+    #path('menu-items/<int:id>/', views.single_item),
     #path function defines URL pattern for menuItems view,
     #with path converter that captures integer and stores it as id variable
     
